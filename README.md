@@ -6,21 +6,21 @@ This exercise project aims to provide experience with microservice API design by
 
 Before running the project, make sure you have the following installed:
 
-- **Docker**
-- **Docker Compose**
+- Docker
+- Docker Compose
 
 ## Run Locally
 
 1. **Clone the project:**
-   ```sh
+   ```
    git clone https://github.com/19104146/it3103_exercise3.git
    ```
 2. **Go to the project directory:**
-   ```sh
+   ```
    cd it3103_exercise3
    ```
 3. **Run the project:**
-   ```sh
+   ```
    docker-compose up -d
    ```
    > Note: The command above will expose ports corresponding to each service:
