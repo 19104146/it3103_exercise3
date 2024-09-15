@@ -1,0 +1,19 @@
+meta {
+  name: create_product
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3001/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 1,
+    "name": "Mouse",
+    "price": 100.00
+  }
+}

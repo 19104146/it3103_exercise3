@@ -1,0 +1,19 @@
+meta {
+  name: update_product
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3001/products/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 1,
+    "name": "Keyboard",
+    "price": 200.00
+  }
+}

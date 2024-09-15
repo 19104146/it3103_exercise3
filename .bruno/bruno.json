@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "name": "it3103_exercise3",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"]
+}
