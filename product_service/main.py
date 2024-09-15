@@ -20,7 +20,7 @@ def list_products():
     return products
 
 
-@app.post("/products", response_model=int)
+@app.post("/products", response_model=int, status_code=201)
 def create_product(product: Product):
     if any(p["id"] == product.id for p in products):
         raise HTTPException(status_code=400, detail="Product with this ID already exists")
@@ -36,7 +36,7 @@ def read_product(product_id: int):
     return product
 
 
-@app.put("/products/{product_id}", response_model=Product)
+@app.put("/products/{product_id}", response_model=Product, status_code=201)
 def update_product(product_id: int, product: Product):
     index = next((i for i, p in enumerate(products) if p["id"] == product_id), None)
     if index is None:
