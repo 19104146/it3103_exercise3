@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  product_service:
+    build:
+      context: "./product_service"
+    ports:
+      - "3001:3001"
+    environment:
+      - "PYTHONUNBUFFERED=1"
