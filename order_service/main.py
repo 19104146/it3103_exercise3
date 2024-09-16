@@ -1,10 +1,7 @@
-from typing import List
-
 import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
-app = FastAPI()
+from typing_extensions import Any
 
 
 class OrderItem(BaseModel):
@@ -13,76 +10,100 @@ class OrderItem(BaseModel):
 
 
 class Order(BaseModel):
-    id: int
+    order_id: int
     customer_key: int
-    order_items: List[OrderItem]
+    order_items: list[OrderItem]
 
 
-orders: List[Order] = [
+class CustomerDetail(BaseModel):
+    name: str
+
+
+class ProductDetail(BaseModel):
+    name: str
+    price: float
+
+
+class OrderItemDetail(BaseModel):
+    product: ProductDetail
+    quantity: int
+
+
+class OrderDetail(BaseModel):
+    order_id: int
+    customer: CustomerDetail
+    order_items: list[OrderItemDetail]
+
+
+app = FastAPI()
+orders: list[Order] = [
     Order(
-        id=1, customer_key=1, order_items=[OrderItem(product_key=2, quantity=5), OrderItem(product_key=1, quantity=3)]
+        order_id=1,
+        customer_key=1,
+        order_items=[
+            OrderItem(product_key=1, quantity=1),
+        ],
     ),
-    Order(id=2, customer_key=2, order_items=[OrderItem(product_key=1, quantity=3)]),
 ]
 
 
-@app.get("/orders", response_model=List[dict])
-def list_orders():
-    order_details = []
+def fetch(url: str, detail: str) -> dict[str, Any]:
+    response = requests.get(url)
+    if not response.ok:
+        if response.status_code == 404:
+            raise HTTPException(status_code=response.status_code, detail=detail)
+        raise HTTPException(status_code=response.status_code)
 
-    for o in orders:
-        order_detail = {}
-        order_detail["id"] = o.id
-
-        response = requests.get(f"http://localhost:3002/customers/{o.customer_key}")
-        if not response.ok:
-            raise HTTPException(status_code=response.status_code, detail="Customer not found")
-        customer = response.json()
-        order_detail["customer"] = customer
-
-        order_item_details = []
-        for oi in o.order_items:
-            response = requests.get(f"http://localhost:3001/products/{oi.product_key}")
-            if not response.ok:
-                raise HTTPException(status_code=response.status_code, detail="Product not found")
-            product = response.json()
-            product["quantity"] = oi.quantity
-            order_item_details.append({"product": product})
-
-        order_detail["order_items"] = order_item_details
-        order_details.append(order_detail)
-
-    return order_details
+    try:
+        return response.json()
+    except ValueError:
+        raise HTTPException(status_code=500, detail="Invalid JSON response")
 
 
-@app.post("/orders", response_model=Order)
+def get_customer(customer_key: int) -> CustomerDetail:
+    customer = fetch(f"http://localhost:3002/customers/{customer_key}", "Customer not found")
+    return CustomerDetail(name=customer["username"])
+
+
+def get_product(product_key: int) -> ProductDetail:
+    product = fetch(f"http://localhost:3001/products/{product_key}", "Product not found")
+    return ProductDetail(**product)
+
+
+@app.get("/orders", response_model=list[OrderDetail])
+def list_orders() -> list[OrderDetail]:
+    def get_order_items(order):
+        products = [get_product(order_item.product_key) for order_item in order.order_items]
+        return [
+            OrderItemDetail(product=product, quantity=order_item.quantity)
+            for product, order_item in zip(products, order.order_items)
+        ]
+
+    return [
+        OrderDetail(
+            order_id=order.order_id,
+            customer=get_customer(order.customer_key),
+            order_items=get_order_items(order),
+        )
+        for order in orders
+    ]
+
+
+@app.post("/orders", response_model=Order, status_code=201)
 def create_order(order: Order):
-    if any(o.id == order.id for o in orders):
-        raise HTTPException(status_code=409, detail="Order already exists")
+    return
 
-    response = requests.get("http://localhost:3002/customers")
-    if not response.ok:
-        raise HTTPException(status_code=response.status_code, detail="Unable to fetch customers")
-    customers = response.json()
-    if not any(c["id"] == order.customer_key for c in customers):
-        raise HTTPException(status_code=404, detail="Customer not found")
 
-    response = requests.get("http://localhost:3001/products")
-    if not response.ok:
-        raise HTTPException(status_code=response.status_code, detail="Unable to fetch products")
-    products = response.json()
-    product_keys = {p["id"] for p in products}
-    for item in order.order_items:
-        if item.product_key not in product_keys:
-            raise HTTPException(status_code=404, detail="Product not found")
+@app.get("/orders/{order_id}", response_model=OrderDetail)
+def read_order(order_id: int):
+    return
 
-    orders.append(order)
-    return order
 
-@app.delete("/orders/{order_id}")
+@app.put("/orders/{order_id}", response_model=Order, status_code=201)
+def update_order(order_id: int, order: Order):
+    return
+
+
+@app.delete("/orders/{order_id}", response_model=Order)
 def delete_order(order_id: int):
-    index = next((i for i, o in enumerate(orders) if o.id == order_id), None)
-    if index is None:
-        raise HTTPException(status_code=404, detail="Order notsssss found")
-    return orders.pop(index)
-
+    return
