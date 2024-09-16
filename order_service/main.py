@@ -78,3 +78,11 @@ def create_order(order: Order):
 
     orders.append(order)
     return order
+
+@app.delete("/orders/{order_id}")
+def delete_order(order_id: int):
+    index = next((i for i, o in enumerate(orders) if o.id == order_id), None)
+    if index is None:
+        raise HTTPException(status_code=404, detail="Order notsssss found")
+    return orders.pop(index)
+
