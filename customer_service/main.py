@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 
+app = FastAPI()
+
 
 class Customer(BaseModel):
     id: int
@@ -16,8 +18,6 @@ customers: List[Customer] = [
     Customer(id=1, username="carlo", email="carlo@gmail.com", password="carlo"),
     Customer(id=2, username="achille", email="achille@gmail.com", password="achille"),
 ]
-
-app = FastAPI()
 
 
 @app.get("/customers", response_model=List[Customer])
