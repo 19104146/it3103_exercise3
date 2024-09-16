@@ -6,8 +6,8 @@ This exercise project aims to provide experience with microservice API design by
 
 Before running the project, make sure you have the following installed:
 
-- Docker
-- Docker Compose
+- [Docker](https://docs.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
 ## Run Locally
 
@@ -28,3 +28,7 @@ Before running the project, make sure you have the following installed:
    > - http://localhost:3001 - Product Service
    > - http://localhost:3002 - Customer Service
    > - http://localhost:3003 - Order Service
+4. **Stop the project:**
+   ```
+   docker-compose down
+   ```
