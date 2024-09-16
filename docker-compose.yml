@@ -8,3 +8,10 @@ services:
       - "3001:3001"
     environment:
       - "PYTHONUNBUFFERED=1"
+  customer_service:
+    build:
+      context: "./customer_service"
+    ports:
+      - "3002:3002"
+    environment:
+      - "PYTHONUNBUFFERED=1"
