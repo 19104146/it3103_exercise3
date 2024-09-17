@@ -31,7 +31,7 @@ def create_customer(new_customer: Customer) -> Customer:
 
 @app.get("/customers/{customer_id}", response_model=Customer)
 def read_customer(customer_id: int) -> Customer:
-    customer = next((c for c in customers if c.id == customer_id), None)
+    customer = next((customer for customer in customers if customer.id == customer_id), None)
     if customer is None:
         raise HTTPException(status_code=404, detail="Customer not found")
     return customer
