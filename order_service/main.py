@@ -99,6 +99,7 @@ def get_customer(customer_key: int, settings: Dict = Depends(get_settings)) -> C
 def get_product(product_key: int, settings: Dict = Depends(get_settings)) -> ProductDetail:
     try:
         product = fetch(f"{settings['product_service_url']}/products/{product_key}", "Product does not exist")
+        product["price"] = Decimal(str(product["price"]))
         return ProductDetail(**product)
     except ServiceUnavailableError as e:
         raise HTTPException(status_code=503, detail=str(e))
