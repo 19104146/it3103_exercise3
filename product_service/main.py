@@ -1,20 +1,28 @@
-from typing import List, Optional
+from decimal import ROUND_DOWN, Decimal
 
-from fastapi import FastAPI
-from fastapi.exceptions import HTTPException
-from pydantic import BaseModel
-
-app = FastAPI()
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, validator
+from typing_extensions import List
 
 
 class Product(BaseModel):
-    id: int
+    id: int = Field(gt=0)
     name: str
-    description: Optional[str] = None
-    price: float
+    price: Decimal = Field(gt=0)
+
+    @validator("price")
+    def validate_price(cls, v: Decimal):
+        return v.quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+
+    class Config:
+        json_encoders = {Decimal: lambda v: str(v)}
 
 
-products: List[Product] = []
+app = FastAPI()
+
+products: List[Product] = [
+    Product(id=1, name="LEGO Set", price=Decimal("3391.78")),
+]
 
 
 @app.get("/products", response_model=List[Product])
@@ -22,34 +30,37 @@ def list_products():
     return products
 
 
-@app.post("/products", response_model=int, status_code=201)
-def create_product(product: Product):
-    if any(p.id == product.id for p in products):
-        raise HTTPException(status_code=400, detail="Product with this ID already exists")
-    products.append(product)
-    return product.id
+@app.post("/products", response_model=Product, status_code=201)
+def create_product(new_product: Product) -> Product:
+    if any(product.id == new_product.id for product in products):
+        raise HTTPException(status_code=409, detail="Product already exists")
+    products.append(new_product)
+    return new_product
 
 
 @app.get("/products/{product_id}", response_model=Product)
-def read_product(product_id: int):
-    product = next((p for p in products if p.id == product_id), None)
+def read_product(product_id: int) -> Product:
+    product = next((product for product in products if product.id == product_id), None)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
 
 @app.put("/products/{product_id}", response_model=Product, status_code=201)
-def update_product(product_id: int, product: Product):
-    index = next((i for i, p in enumerate(products) if p.id == product_id), None)
-    if index is None:
+def update_product(product_id: int, updated_product: Product) -> Product:
+    product_index = find_product_index(product_id)
+    products[product_index] = updated_product
+    return updated_product
+
+
+def find_product_index(product_id: int) -> int:
+    product_index = next((index for index, product in enumerate(products) if product.id == product_id), None)
+    if product_index is None:
         raise HTTPException(status_code=404, detail="Product not found")
-    products[index] = product
-    return products[index]
+    return product_index
 
 
 @app.delete("/products/{product_id}", response_model=Product)
-def delete_product(product_id: int):
-    index = next((i for i, p in enumerate(products) if p.id == product_id), None)
-    if index is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return products.pop(index)
+def delete_product(product_id: int) -> Product:
+    product_index = find_product_index(product_id)
+    return products.pop(product_index)
