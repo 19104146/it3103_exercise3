@@ -5,8 +5,7 @@ from pydantic import BaseModel, Field, validator
 from typing_extensions import List
 
 
-class Product(BaseModel):
-    id: int = Field(gt=0)
+class BaseProduct(BaseModel):
     name: str
     price: Decimal = Field(gt=0)
 
@@ -16,6 +15,10 @@ class Product(BaseModel):
 
     class Config:
         json_encoders = {Decimal: lambda v: str(v)}
+
+
+class Product(BaseProduct):
+    id: int = Field(gt=0)
 
 
 app = FastAPI()
@@ -47,10 +50,11 @@ def read_product(product_id: int) -> Product:
 
 
 @app.put("/products/{product_id}", response_model=Product, status_code=201)
-def update_product(product_id: int, updated_product: Product) -> Product:
+def update_product(product_id: int, updated_product: BaseProduct) -> Product:
     product_index = find_product_index(product_id)
-    products[product_index] = updated_product
-    return updated_product
+    updated_product_with_id = Product(id=product_id, name=updated_product.name, price=updated_product.price)
+    products[product_index] = updated_product_with_id
+    return updated_product_with_id
 
 
 def find_product_index(product_id: int) -> int:

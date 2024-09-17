@@ -13,8 +13,7 @@ class Item(BaseModel):
     quantity: int = Field(gt=0)
 
 
-class Order(BaseModel):
-    id: int = Field(gt=0)
+class BaseOrder(BaseModel):
     customer_key: int = Field(gt=0)
     items: List[Item]
 
@@ -23,6 +22,10 @@ class Order(BaseModel):
         if not v:
             raise ValueError("Order must contain at least one item")
         return v
+
+
+class Order(BaseOrder):
+    id: int = Field(gt=0)
 
 
 class CustomerDetail(BaseModel):
@@ -164,7 +167,7 @@ def find_order_index(order_id: int) -> int:
 
 
 @app.put("/orders/{order_id}", response_model=Order)
-def update_order(order_id: int, updated_order: Order, settings: Dict = Depends(get_settings)):
+def update_order(order_id: int, updated_order: BaseOrder, settings: Dict = Depends(get_settings)):
     order_index = find_order_index(order_id)
 
     try:
@@ -174,8 +177,9 @@ def update_order(order_id: int, updated_order: Order, settings: Dict = Depends(g
     except ServiceUnavailableError as error:
         raise HTTPException(status_code=503, detail=str(error))
 
-    orders[order_index] = updated_order
-    return update_order
+    updated_order_with_id = Order(id=order_id, customer_key=updated_order.customer_key, items=updated_order.items)
+    orders[order_index] = updated_order_with_id
+    return updated_order_with_id
 
 
 @app.delete("/orders/{order_id}", response_model=Order)

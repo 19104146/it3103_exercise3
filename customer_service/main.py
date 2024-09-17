@@ -3,9 +3,12 @@ from pydantic import BaseModel, Field
 from typing_extensions import List
 
 
-class Customer(BaseModel):
-    id: int = Field(gt=0)
+class BaseCustomer(BaseModel):
     name: str
+
+
+class Customer(BaseCustomer):
+    id: int = Field(gt=0)
 
 
 app = FastAPI()
@@ -38,10 +41,11 @@ def read_customer(customer_id: int) -> Customer:
 
 
 @app.put("/customers/{customer_id}", response_model=Customer, status_code=201)
-def update_customer(customer_id: int, updated_customer: Customer) -> Customer:
+def update_customer(customer_id: int, updated_customer: BaseCustomer) -> Customer:
     customer_index = find_customer_index(customer_id)
-    customers[customer_index] = updated_customer
-    return updated_customer
+    updated_customer_with_id = Customer(id=customer_id, name=updated_customer.name)
+    customers[customer_index] = updated_customer_with_id
+    return updated_customer_with_id
 
 
 def find_customer_index(customer_id: int) -> int:
