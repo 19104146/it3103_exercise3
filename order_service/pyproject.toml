@@ -1,3 +1,7 @@
+[tool.pyright]
+venv = ".venv"
+venvPath = "."
+
 [tool.ruff]
 line-length = 120
 target-version = "py311"

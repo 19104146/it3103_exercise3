@@ -9,14 +9,11 @@ app = FastAPI()
 
 class Customer(BaseModel):
     id: int
-    username: str
-    email: str
-    password: str
+    name: str
 
 
 customers: List[Customer] = [
-    Customer(id=1, username="carlo", email="carlo@gmail.com", password="carlo"),
-    Customer(id=2, username="achille", email="achille@gmail.com", password="achille"),
+    Customer(id=1, name="carlo"),
 ]
 
 
