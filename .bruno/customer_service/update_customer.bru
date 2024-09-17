@@ -1,11 +1,11 @@
 meta {
-  name: update_product
+  name: update_customer
   type: http
   seq: 4
 }
 
 put {
-  url: http://localhost:3001/products/2
+  url: http://localhost:3002/customers/2
   body: json
   auth: none
 }
@@ -13,7 +13,6 @@ put {
 body:json {
   {
     "id": 2,
-    "name": "Ajax",
-    "price": 99.99
+    "name": "Jane Doe"
   }
 }

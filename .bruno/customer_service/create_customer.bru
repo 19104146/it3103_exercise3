@@ -1,11 +1,11 @@
 meta {
-  name: create_product
+  name: create_customer
   type: http
   seq: 2
 }
 
 post {
-  url: http://localhost:3001/products
+  url: http://localhost:3002/customers
   body: json
   auth: none
 }
@@ -13,7 +13,6 @@ post {
 body:json {
   {
     "id": 2,
-    "name": "Acme",
-    "price": 99.99
+    "name": "John Doe"
   }
 }
