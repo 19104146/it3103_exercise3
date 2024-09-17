@@ -82,18 +82,18 @@ def fetch(url: str, detail: str) -> Dict[str, Any]:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
         return response.json()
-    except RequestException as e:
-        if isinstance(e, HTTPError) and e.response.status_code == 404:
+    except RequestException as error:
+        if isinstance(error, HTTPError) and error.response.status_code == 404:
             raise HTTPException(status_code=404, detail=detail)
-        raise ServiceUnavailableError(f"Error fetching data: {str(e)}")
+        raise ServiceUnavailableError(f"Error fetching data: {str(error)}")
 
 
 def get_customer(customer_key: int, settings: Dict = Depends(get_settings)) -> CustomerDetail:
     try:
         customer = fetch(f"{settings['customer_service_url']}/customers/{customer_key}", "Customer does not exist")
         return CustomerDetail(name=customer["name"])
-    except ServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except ServiceUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error))
 
 
 def get_product(product_key: int, settings: Dict = Depends(get_settings)) -> ProductDetail:
@@ -101,16 +101,16 @@ def get_product(product_key: int, settings: Dict = Depends(get_settings)) -> Pro
         product = fetch(f"{settings['product_service_url']}/products/{product_key}", "Product does not exist")
         product["price"] = Decimal(str(product["price"]))
         return ProductDetail(**product)
-    except ServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except ServiceUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error))
 
 
 @app.get("/orders", response_model=List[OrderDetail])
 def list_orders(settings: dict = Depends(get_settings)) -> List[OrderDetail]:
     try:
         return [get_order_detail(order, settings) for order in orders]
-    except ServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except ServiceUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error))
 
 
 def get_order_detail(order: Order, settings: Dict) -> OrderDetail:
@@ -133,8 +133,8 @@ def create_order(new_order: Order, settings: Dict = Depends(get_settings)) -> Or
         get_customer(new_order.customer_key, settings)
         for item in new_order.items:
             get_product(item.product_key, settings)
-    except ServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except ServiceUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error))
 
     orders.append(new_order)
     return new_order
@@ -145,8 +145,8 @@ def read_order(order_id: int, settings: Dict = Depends(get_settings)):
     order = find_order(order_id)
     try:
         return get_order_detail(order, settings)
-    except ServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except ServiceUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error))
 
 
 def find_order(order_id: int) -> Order:
@@ -157,7 +157,7 @@ def find_order(order_id: int) -> Order:
 
 
 def find_order_index(order_id: int) -> int:
-    order_index = next((i for i, o in enumerate(orders) if o.id == order_id), None)
+    order_index = next((index for index, order in enumerate(orders) if order.id == order_id), None)
     if order_index is None:
         raise HTTPException(status_code=404, detail="Order not found")
     return order_index
@@ -171,8 +171,8 @@ def update_order(order_id: int, updated_order: Order, settings: Dict = Depends(g
         get_customer(updated_order.customer_key, settings)
         for item in updated_order.items:
             get_product(item.product_key, settings)
-    except ServiceUnavailableError as e:
-        raise HTTPException(status_code=503, detail=str(e))
+    except ServiceUnavailableError as error:
+        raise HTTPException(status_code=503, detail=str(error))
 
     orders[order_index] = updated_order
     return update_order
