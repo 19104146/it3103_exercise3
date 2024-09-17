@@ -72,8 +72,8 @@ orders: List[Order] = [
 @lru_cache()
 def get_settings():
     return {
-        "customer_service_url": "http://localhost:3002",
-        "product_service_url": "http://localhost:3001",
+        "product_service_url": "http://product_service:3001",
+        "customer_service_url": "http://customer_service:3002",
     }
 
 
