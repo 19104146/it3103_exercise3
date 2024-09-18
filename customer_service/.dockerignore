@@ -1,18 +1,2 @@
-# Caches
-.ruff_cache/
-__pycache__/
-*.py[cod]
-
-# Editor configurations
-.idea/
-.vscode/
-.zed/
-
-# Environments
-.venv/
-.env
-
-# Miscellaneous
-*.log
-.DS_Store
-Thumbs.db
+**/__pycache__/
+**/*.py[cod]
