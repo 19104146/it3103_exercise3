@@ -1,10 +1,9 @@
-from decimal import ROUND_DOWN, Decimal
+from decimal import Decimal
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    field_validator,
     model_serializer,
 )
 from typing_extensions import Any, Dict
@@ -19,11 +18,7 @@ class BaseProduct(BaseModel):
     )
 
     name: str = Field(..., min_length=1, max_length=100)
-    price: Decimal = Field(..., gt=0, strict=False)
-
-    @field_validator("price")
-    def round_down_price(cls, v: Decimal):
-        return v.quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+    price: Decimal = Field(..., decimal_places=2, gt=0, strict=False)
 
 
 class ProductRead(BaseProduct):
