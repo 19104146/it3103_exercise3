@@ -1,34 +1,34 @@
 # IT 3103 - Exercise 3
 
-This exercise project aims to provide experience with microservice API design by implementing a simple system of intercommunicating services. The system will manage **Products**, **Customers**, and **Orders** services.
+This project provides hands-on experience with microservice API design through a system managing **Products**, **Customers**, and **Orders** services.
 
 ## Prerequisites
 
-Before running the project, make sure you have the following installed:
+Ensure the following are installed:
 
 - [Docker](https://docs.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-## Run Locally
+## Getting Started
 
-1. **Clone the project:**
-   ```
+1. **Clone the repository:**
+   ```bash
    git clone https://github.com/19104146/it3103_exercise3.git
    ```
-2. **Go to the project directory:**
-   ```
+2. **Navigate to the project directory:**
+   ```bash
    cd it3103_exercise3
    ```
-3. **Run the project:**
+3. **Start the services:**
+   ```bash
+   docker-compose up --build -d
    ```
-   docker-compose up -d
-   ```
-   > Note: The command above will expose ports corresponding to each service:
+   > **Services are accessible at:**
    >
-   > - http://localhost:3001 - Product Service
-   > - http://localhost:3002 - Customer Service
-   > - http://localhost:3003 - Order Service
-4. **Stop the project:**
-   ```
+   > - Product Service: [http://localhost:3001](http://localhost:3001)
+   > - Customer Service: [http://localhost:3002](http://localhost:3002)
+   > - Order Service: [http://localhost:3003](http://localhost:3003)
+4. **Stop the services:**
+   ```bash
    docker-compose down
    ```
