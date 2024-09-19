@@ -1,14 +1,21 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_serializer
+from typing_extensions import Any, Dict
 
 
-class CustomerRead(BaseModel):
-    id: int = Field(..., gt=0)
+class BaseCustomer(BaseModel):
+    model_config = ConfigDict(extra="forbid", from_attributes=True, strict=True)
+
     name: str = Field(..., min_length=1, max_length=747)
 
-    class Config:
-        from_attributes = True
+
+class CustomerRead(BaseCustomer):
+    id: int = Field(..., gt=0)
+
+    @model_serializer(when_used="json")
+    def ser_model(self) -> Dict[str, Any]:
+        attributes = self.dict()
+        return {"id": attributes.pop("id"), **attributes}
 
 
-class CustomerWrite(CustomerRead):
-    class Config(CustomerRead.Config):
-        fields = {"id": {"exclude": True}}
+class CustomerWrite(BaseCustomer):
+    pass
