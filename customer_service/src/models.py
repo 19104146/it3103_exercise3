@@ -9,5 +9,6 @@ class CustomerRead(BaseModel):
         from_attributes = True
 
 
-class CustomerWrite(BaseModel):
-    name: str = Field(..., min_length=1, max_length=747)
+class CustomerWrite(CustomerRead):
+    class Config(CustomerRead.Config):
+        fields = {"id": {"exclude": True}}

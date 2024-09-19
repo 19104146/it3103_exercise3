@@ -31,7 +31,8 @@ def read_customer(customer_id: int = Path(..., gt=0)) -> CustomerRead:
     if customer := get_customer(customer_id):
         return customer
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Customer not found",
     )
 
 
@@ -41,7 +42,8 @@ def read_customer(customer_id: int = Path(..., gt=0)) -> CustomerRead:
     status_code=status.HTTP_201_CREATED,
 )
 def update_customer(
-    customer_id: int = Path(..., gt=0), customer: CustomerWrite = Body(...)
+    customer_id: int = Path(..., gt=0),
+    customer: CustomerWrite = Body(...),
 ) -> CustomerRead:
     if existing_customer := get_customer(customer_id):
         updated_customer = existing_customer.copy(update=customer.dict())
@@ -49,7 +51,8 @@ def update_customer(
         customers[index] = updated_customer
         return updated_customer
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Customer not found",
     )
 
 
@@ -59,5 +62,6 @@ def delete_customer(customer_id: int = Path(..., gt=0)):
         customers.remove(customer)
         return customer
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found"
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Customer not found",
     )
