@@ -1,18 +1,22 @@
-# Caches
-.ruff_cache/
+# Ignore Python caches
 __pycache__/
 *.py[cod]
 
-# Editor configurations
+# Ignore virtual environment
+.venv/
+
+# Ignore environment variables
+.env.*
+
+# Ignore Ruff cache
+.ruff_cache/
+
+# Ignore IDE settings
 .idea/
 .vscode/
 .zed/
 
-# Environments
-.venv/
-.env
-
-# Miscellaneous
+# Ignore miscellaneous
 *.log
 .DS_Store
 Thumbs.db

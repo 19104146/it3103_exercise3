@@ -1,0 +1,25 @@
+services:
+  product_service:
+    build:
+      context: ./product_service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PYTHONUNBUFFERED=1
+  customer_service:
+    build:
+      context: ./customer_service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PYTHONUNBUFFERED=1
+  order_service:
+    build:
+      context: ./order_service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PYTHONUNBUFFERED=1
